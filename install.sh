@@ -221,10 +221,39 @@ auth:
   type: password
   password: ${pwd}    # 密码
 
-ignoreClientBandwidth: true
+ignoreClientBandwidth: true	#宽带速率
 
+resolver:		#DNS
+  type: udp
+  tcp:
+    addr: 8.8.8.8:53 
+    timeout: 4s 
+  udp:
+    addr: 8.8.4.4:53 
+    timeout: 4s
+  tls:
+    addr: 1.1.1.1:853 
+    timeout: 10s
+    sni: cloudflare-dns.com 
+    insecure: false 
+  https:
+    addr: 1.1.1.1:443 
+    timeout: 10s
+    sni: cloudflare-dns.com
+    insecure: false
+
+masquerade:	#伪装
+  type: proxy
+  proxy:
+    url: https://pan.loli.cab/ #伪装网址
+    rewriteHost: true
+	
 acl:
   inline:
+	- reject(suffix:v2ex.com)
+    - reject(all, udp/443)
+    - reject(geoip:cn)
+    - reject(geosite:netflix)
     # 如果你想利用 *ray 的分流规则, 那么在hy2自己的分流规则里面设置全部走socks5出去, 将下面一行的注释取消
     # - s5_outbound(all)
 
